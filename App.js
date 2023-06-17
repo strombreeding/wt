@@ -2,14 +2,13 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Button, ScrollView, Dimensions, Platform, StatusBar } from "react-native";
 import { getStatusBarHeight } from "react-native-status-bar-height";
-
+import * as Location from "expo-location";
 //config
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 console.log(SCREEN_WIDTH, SCREEN_HEIGHT * 0.1);
 
 const StatusBarHeight = Platform.OS === "ios" ? getStatusBarHeight(true) : StatusBar.currentHeight;
 const getDay = (day) => {
-  console.log("ㅎㅇㅎㅇ");
   switch (day) {
     case 0:
       day = "일";
@@ -41,12 +40,44 @@ const date = {
   date: new Date().getDate(),
   day: getDay(new Date().getDay()),
 };
-console.log(date);
+// console.log(date);
+
 export default function App() {
-  const [x, setX] = useState(0);
+  const [location, setLocation] = useState({ city: null, district: null });
+  const [ok, setOk] = useState(null);
+
+  /** 위치관련 권한 허용 묻기 */
+  const ask = async () => {
+    const { granted, status } = await Location.requestForegroundPermissionsAsync();
+    console.log(granted, status);
+    if (!granted || !status) {
+      console.log("비동의");
+      alert("동의하지 않음");
+      setOk(false);
+    } else {
+      setOk(true);
+    }
+  };
+  const getLocation = async () => {
+    console.log("할룽방구");
+    const {
+      coords: { latitude, longitude },
+    } = await Location.getCurrentPositionAsync({ accuracy: 5 });
+    console.log(latitude, longitude, "??");
+    // return location;
+    const location = await Location.reverseGeocodeAsync({ latitude, longitude }, { useGoogleMaps: false });
+    // console.log(city, district, postalCode);
+    console.log(location[0].city, location[0].district);
+    setLocation({ city: location[0].city, district: location[0].district });
+  };
   useEffect(() => {
-    // this.scrollView.scrollTo({ y: 812 * 2 });
+    ask();
+    if (ok) {
+      getLocation();
+    }
+    console.log(location);
   }, []);
+
   return (
     <View
       style={{
@@ -73,8 +104,9 @@ export default function App() {
         {/* 현재 */}
         <View id="1" style={styles.nowWeater}>
           <View style={{ backgroundColor: "grey", marginTop: 40 }}>
-            <Text style={styles.titleText}>{[date.year + ".", date.month + ".", date.date + ".", date.day]}</Text>
+            <Text style={styles.dateText}>{[date.year + ".", date.month + ".", date.date + ".", date.day]}</Text>
           </View>
+          <Text style={styles.locationText}>{[location.city + " ", location.district]}</Text>
           <Text style={styles.titleText}>27°C</Text>
           <View style={{ backgroundColor: "grey", width: SCREEN_WIDTH * 0.7, height: 250, marginTop: 30 }}>
             <Text>이미지가 들어갈 공간</Text>
@@ -175,5 +207,13 @@ const styles = StyleSheet.create({
     // marginTop: 50 + StatusBarHeight,
     fontSize: 50,
     backgroundColor: "blue",
+  },
+  dateText: {
+    fontSize: 20,
+    fontWeight: "600",
+  },
+  locationText: {
+    fontSize: 20,
+    fontWeight: "600",
   },
 });
