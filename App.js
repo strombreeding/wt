@@ -3,37 +3,14 @@ import { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Button, ScrollView, Dimensions, Platform, StatusBar } from "react-native";
 import { getStatusBarHeight } from "react-native-status-bar-height";
 import * as Location from "expo-location";
+import { getDay } from "./utils";
+
 //config
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 console.log(SCREEN_WIDTH, SCREEN_HEIGHT * 0.1);
 
 const StatusBarHeight = Platform.OS === "ios" ? getStatusBarHeight(true) : StatusBar.currentHeight;
-const getDay = (day) => {
-  switch (day) {
-    case 0:
-      day = "일";
-      break;
-    case 1:
-      day = "월";
-      break;
-    case 2:
-      day = "화";
-      break;
-    case 3:
-      day = "수";
-      break;
-    case 4:
-      day = "목";
-      break;
-    case 5:
-      day = "금";
-      break;
-    case 6:
-      day = "토";
-      break;
-  }
-  return day;
-};
+
 const date = {
   year: new Date().getFullYear(),
   month: new Date().getMonth() + 1,
@@ -104,11 +81,21 @@ export default function App() {
         {/* 현재 */}
         <View id="1" style={styles.nowWeater}>
           <View style={{ backgroundColor: "grey", marginTop: 40 }}>
-            <Text style={styles.dateText}>{[date.year + ".", date.month + ".", date.date + ".", date.day]}</Text>
+            <Text style={styles.locationText}>{[location.city + " ", location.district]}</Text>
+            <Text style={styles.dateText}>
+              {[date.year + "-", date.month + "-", date.date + "-", date.day + "요일"]}
+            </Text>
           </View>
-          <Text style={styles.locationText}>{[location.city + " ", location.district]}</Text>
           <Text style={styles.titleText}>27°C</Text>
-          <View style={{ backgroundColor: "grey", width: SCREEN_WIDTH * 0.7, height: 250, marginTop: 30 }}>
+          <View
+            style={{
+              backgroundColor: "grey",
+              width: SCREEN_WIDTH * 0.7,
+              height: 250,
+              marginTop: 30,
+              alignItems: "center",
+            }}
+          >
             <Text>이미지가 들어갈 공간</Text>
           </View>
           <View
