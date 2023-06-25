@@ -1,4 +1,4 @@
-export const getDay = (day) => {
+const getDayToKr = (day) => {
   switch (day) {
     case 0:
       day = "일";
@@ -23,4 +23,10 @@ export const getDay = (day) => {
       break;
   }
   return day;
+};
+export const dateData = {
+  year: new Date().getFullYear(),
+  month: new Date().getMonth() + 1 < 10 ? `0${new Date().getMonth() + 1}` : new Date().getMonth() + 1,
+  date: new Date().getDate(),
+  day: getDayToKr(new Date().getDay()),
 };
